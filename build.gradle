@@ -1,26 +1,26 @@
 buildscript {
-  repositories {
-    mavenCentral()
-  }
+    repositories {
+        mavenCentral()
+    }
 
-  dependencies {
-    classpath 'com.android.tools.build:gradle:0.7.+'
-  }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.9.+'
+    }
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.9'
+    gradleVersion = '1.10'
 }
 
 allprojects {
-  group = 'com.github.espiandev'
-  version = '3.2.0'
+    group = 'com.github.espiandev'
+    version = '3.2.0-comalia'
 
-  repositories {
-    mavenCentral()
-  }
+    repositories {
+        mavenCentral()
+    }
 
-  tasks.withType(Compile) {
-    options.encoding = "UTF-8"
-  }
+    tasks.withType(Compile) {
+        options.encoding = "UTF-8"
+    }
 }
