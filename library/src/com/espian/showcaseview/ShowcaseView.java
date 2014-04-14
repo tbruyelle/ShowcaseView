@@ -438,24 +438,32 @@ public class ShowcaseView extends RelativeLayout
      * @param absoluteCoordinates   If true, this will use absolute coordinates instead of coordinates relative to the center of the showcased view
      */
     public void animateGesture(float startX, float startY, float endX,
-            float endY, boolean absoluteCoordinates) {
+                               float endY, boolean absoluteCoordinates) {
+        animateGesture(new Animation(startX, startY, endX, endY, absoluteCoordinates));
+    }
+
+    public void animateGesture(final Animation... animations) {
         mHandy = ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE))
                 .inflate(R.layout.handy, null);
         addView(mHandy);
-        moveHand(startX, startY, endX, endY, absoluteCoordinates, new AnimationEndListener() {
-            @Override
-            public void onAnimationEnd() {
-                removeView(mHandy);
-            }
-        });
+
+        moveHand(animations[0], new AnimationEndListener() {
+                    @Override
+                    public void onAnimationEnd() {
+                        removeView(mHandy);
+                        if (animations.length > 1) {
+                            animateGesture(Animation.pop(animations, 1, animations.length));
+                        }
+                    }
+                }
+        );
     }
 
-    private void moveHand(float startX, float startY, float endX,
-            float endY, boolean absoluteCoordinates, AnimationEndListener listener) {
-        AnimationUtils.createMovementAnimation(mHandy, absoluteCoordinates?0:showcaseX,
-                absoluteCoordinates?0:showcaseY,
-                startX, startY,
-                endX, endY,
+    private void moveHand(Animation animation, AnimationEndListener listener) {
+        AnimationUtils.createMovementAnimation(mHandy, animation.absoluteCoordinates ? 0 : showcaseX,
+                animation.absoluteCoordinates ? 0 : showcaseY,
+                animation.startX, animation.startY,
+                animation.endX, animation.endY,
                 listener).start();
     }
 
@@ -908,6 +916,29 @@ public class ShowcaseView extends RelativeLayout
 
     public void setScaleMultiplier(float scaleMultiplier) {
         this.scaleMultiplier = scaleMultiplier;
+    }
+
+    public static class Animation {
+        float startX;
+        float startY;
+        float endX;
+        float endY;
+        boolean absoluteCoordinates;
+
+        public Animation(float startX, float startY, float endX, float endY, boolean absoluteCoordinates) {
+            this.startX = startX;
+            this.startY = startY;
+            this.endX = endX;
+            this.endY = endY;
+            this.absoluteCoordinates = absoluteCoordinates;
+        }
+
+        public static Animation[] pop(Animation[] from, int start, int end) {
+            int length = end - start;
+            Animation[] result = new Animation[length];
+            System.arraycopy(from, start, result, 0, length);
+            return result;
+        }
     }
 
 }
