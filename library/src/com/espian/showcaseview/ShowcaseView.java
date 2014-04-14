@@ -132,9 +132,11 @@ public class ShowcaseView extends RelativeLayout
         ConfigOptions options = new ConfigOptions();
         options.showcaseId = getId();
         setConfigOptions(options);
+
+        init();
     }
 
-    void init() {
+    private void init() {
         setHardwareAccelerated(true);
 
         boolean hasShot = getContext()
@@ -388,13 +390,15 @@ public class ShowcaseView extends RelativeLayout
         boolean recalculateText = mAlteredText;
         mAlteredText = false;
 
+        //Draw background color
+        canvas.drawColor(mBackgroundColor);
+
         // Draw the showcase drawable
         if (!mHasNoTarget) {
             boolean recalculatedCling = mShowcaseDrawer.calculateShowcaseRect(showcaseX, showcaseY);
             recalculateText = recalculatedCling || recalculateText;
 
-            //Draw background color
-            canvas.drawColor(mBackgroundColor);
+
 
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.HONEYCOMB && !mHasNoTarget) {
                 Path path = new Path();
@@ -437,32 +441,24 @@ public class ShowcaseView extends RelativeLayout
      * @param absoluteCoordinates   If true, this will use absolute coordinates instead of coordinates relative to the center of the showcased view
      */
     public void animateGesture(float startX, float startY, float endX,
-                               float endY, boolean absoluteCoordinates) {
-        animateGesture(new Animation(startX, startY, endX, endY, absoluteCoordinates));
-    }
-
-    public void animateGesture(final Animation... animations) {
+            float endY, boolean absoluteCoordinates) {
         mHandy = ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE))
                 .inflate(R.layout.handy, null);
         addView(mHandy);
-
-        moveHand(animations[0], new AnimationEndListener() {
-                    @Override
-                    public void onAnimationEnd() {
-                        removeView(mHandy);
-                        if (animations.length > 1) {
-                            animateGesture(Animation.pop(animations, 1, animations.length));
-                        }
-                    }
-                }
-        );
+        moveHand(startX, startY, endX, endY, absoluteCoordinates, new AnimationEndListener() {
+            @Override
+            public void onAnimationEnd() {
+                removeView(mHandy);
+            }
+        });
     }
 
-    private void moveHand(Animation animation, AnimationEndListener listener) {
-        AnimationUtils.createMovementAnimation(mHandy, animation.absoluteCoordinates ? 0 : showcaseX,
-                animation.absoluteCoordinates ? 0 : showcaseY,
-                animation.startX, animation.startY,
-                animation.endX, animation.endY,
+    private void moveHand(float startX, float startY, float endX,
+            float endY, boolean absoluteCoordinates, AnimationEndListener listener) {
+        AnimationUtils.createMovementAnimation(mHandy, absoluteCoordinates?0:showcaseX,
+                absoluteCoordinates?0:showcaseY,
+                startX, startY,
+                endX, endY,
                 listener).start();
     }
 
@@ -642,13 +638,12 @@ public class ShowcaseView extends RelativeLayout
      */
     @Deprecated
     public static ShowcaseView insertShowcaseView(View viewToShowcase, Activity activity,
-                                                  String title,
-                                                  String detailText, ConfigOptions options) {
+            String title,
+            String detailText, ConfigOptions options) {
         ShowcaseView sv = new ShowcaseView(activity);
         if (options != null) {
             sv.setConfigOptions(options);
         }
-        sv.init();
         if (sv.getConfigOptions().insert == INSERT_TO_DECOR) {
             ((ViewGroup) activity.getWindow().getDecorView()).addView(sv);
         } else {
@@ -677,7 +672,6 @@ public class ShowcaseView extends RelativeLayout
         if (options != null) {
             sv.setConfigOptions(options);
         }
-        sv.init();
         if (sv.getConfigOptions().insert == INSERT_TO_DECOR) {
             ((ViewGroup) activity.getWindow().getDecorView()).addView(sv);
         } else {
@@ -724,7 +718,6 @@ public class ShowcaseView extends RelativeLayout
         if (options != null) {
             sv.setConfigOptions(options);
         }
-        sv.init();
         if (sv.getConfigOptions().insert == INSERT_TO_DECOR) {
             ((ViewGroup) activity.getWindow().getDecorView()).addView(sv);
         } else {
@@ -745,7 +738,6 @@ public class ShowcaseView extends RelativeLayout
         if (options != null) {
             sv.setConfigOptions(options);
         }
-        sv.init();
         if (sv.getConfigOptions().insert == INSERT_TO_DECOR) {
             ((ViewGroup) activity.getWindow().getDecorView()).addView(sv);
         } else {
@@ -784,7 +776,6 @@ public class ShowcaseView extends RelativeLayout
         if (options != null) {
             sv.setConfigOptions(options);
         }
-        sv.init();
         if (sv.getConfigOptions().insert == INSERT_TO_DECOR) {
             ((ViewGroup) activity.getWindow().getDecorView()).addView(sv);
         } else {
@@ -814,7 +805,6 @@ public class ShowcaseView extends RelativeLayout
         if (options != null) {
             sv.setConfigOptions(options);
         }
-        sv.init();
         if (sv.getConfigOptions().insert == INSERT_TO_DECOR) {
             ((ViewGroup) activity.getWindow().getDecorView()).addView(sv);
         } else {
@@ -837,7 +827,6 @@ public class ShowcaseView extends RelativeLayout
                                                            String detail, ConfigOptions options) {
         ShowcaseView sv = new ShowcaseView(activity);
         sv.setConfigOptions(options);
-        sv.init();
         if (sv.getConfigOptions().insert == INSERT_TO_DECOR) {
             ((ViewGroup) activity.getWindow().getDecorView()).addView(sv);
         } else {
@@ -922,29 +911,6 @@ public class ShowcaseView extends RelativeLayout
 
     public void setScaleMultiplier(float scaleMultiplier) {
         this.scaleMultiplier = scaleMultiplier;
-    }
-
-    public static class Animation {
-        float startX;
-        float startY;
-        float endX;
-        float endY;
-        boolean absoluteCoordinates;
-
-        public Animation(float startX, float startY, float endX, float endY, boolean absoluteCoordinates) {
-            this.startX = startX;
-            this.startY = startY;
-            this.endX = endX;
-            this.endY = endY;
-            this.absoluteCoordinates = absoluteCoordinates;
-        }
-
-        public static Animation[] pop(Animation[] from, int start, int end) {
-            int length = end - start;
-            Animation[] result = new Animation[length];
-            System.arraycopy(from, start, result, 0, length);
-            return result;
-        }
     }
 
 }
