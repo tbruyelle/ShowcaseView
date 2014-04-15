@@ -136,7 +136,7 @@ public class ShowcaseView extends RelativeLayout
         init();
     }
 
-    private void init() {
+    void init() {
         setHardwareAccelerated(true);
 
         boolean hasShot = getContext()
