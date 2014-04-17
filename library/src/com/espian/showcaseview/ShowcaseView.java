@@ -393,9 +393,9 @@ public class ShowcaseView extends RelativeLayout
         //Draw background color
         canvas.drawColor(mBackgroundColor);
 
+        boolean recalculatedCling = mShowcaseDrawer.calculateShowcaseRect(showcaseX, showcaseY);
         // Draw the showcase drawable
         if (!mHasNoTarget) {
-            boolean recalculatedCling = mShowcaseDrawer.calculateShowcaseRect(showcaseX, showcaseY);
             recalculateText = recalculatedCling || recalculateText;
 
 
