@@ -380,26 +380,29 @@ public class ShowcaseView extends RelativeLayout
 
     @Override
     protected void dispatchDraw(Canvas canvas) {
-        if (showcaseX < 0 || showcaseY < 0 || isRedundant) {
+        if (isRedundant) {
             super.dispatchDraw(canvas);
             return;
         }
 
-        boolean recalculatedCling = mShowcaseDrawer.calculateShowcaseRect(showcaseX, showcaseY);
-        boolean recalculateText = recalculatedCling || mAlteredText;
+        boolean recalculateText = mAlteredText;
         mAlteredText = false;
-
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.HONEYCOMB && !mHasNoTarget) {
-        	Path path = new Path();
-            path.addCircle(showcaseX, showcaseY, showcaseRadius, Path.Direction.CW);
-            canvas.clipPath(path, Op.DIFFERENCE);
-        }
 
         //Draw background color
         canvas.drawColor(mBackgroundColor);
 
+        boolean recalculatedCling = mShowcaseDrawer.calculateShowcaseRect(showcaseX, showcaseY);
         // Draw the showcase drawable
         if (!mHasNoTarget) {
+            recalculateText = recalculatedCling || recalculateText;
+
+
+
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.HONEYCOMB && !mHasNoTarget) {
+                Path path = new Path();
+                path.addCircle(showcaseX, showcaseY, showcaseRadius, Path.Direction.CW);
+                canvas.clipPath(path, Op.DIFFERENCE);
+            }
             mShowcaseDrawer.drawShowcase(canvas, showcaseX, showcaseY, scaleMultiplier, showcaseRadius);
         }
 
